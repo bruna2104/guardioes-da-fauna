@@ -1,4 +1,7 @@
+import { donationRouter } from "~/server/api/routers/donation";
+import { ngoRouter } from "~/server/api/routers/ngo";
 import { postRouter } from "~/server/api/routers/post";
+import { rescueRouter } from "~/server/api/routers/rescue";
 import { createCallerFactory, createTRPCRouter } from "~/server/api/trpc";
 
 /**
@@ -8,6 +11,9 @@ import { createCallerFactory, createTRPCRouter } from "~/server/api/trpc";
  */
 export const appRouter = createTRPCRouter({
   post: postRouter,
+  rescue: rescueRouter,
+  ngo: ngoRouter,
+  donation: donationRouter,
 });
 
 // export type definition of API

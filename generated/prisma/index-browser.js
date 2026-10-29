@@ -121,14 +121,6 @@ exports.Prisma.TransactionIsolationLevel = makeStrictEnum({
   Serializable: 'Serializable'
 });
 
-exports.Prisma.PostScalarFieldEnum = {
-  id: 'id',
-  name: 'name',
-  createdAt: 'createdAt',
-  updatedAt: 'updatedAt',
-  createdById: 'createdById'
-};
-
 exports.Prisma.AccountScalarFieldEnum = {
   id: 'id',
   userId: 'userId',
@@ -157,13 +149,86 @@ exports.Prisma.UserScalarFieldEnum = {
   name: 'name',
   email: 'email',
   emailVerified: 'emailVerified',
-  image: 'image'
+  image: 'image',
+  phone: 'phone',
+  city: 'city',
+  state: 'state',
+  role: 'role',
+  ngoId: 'ngoId',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
 };
 
 exports.Prisma.VerificationTokenScalarFieldEnum = {
   identifier: 'identifier',
   token: 'token',
   expires: 'expires'
+};
+
+exports.Prisma.PostScalarFieldEnum = {
+  id: 'id',
+  name: 'name',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt',
+  createdById: 'createdById'
+};
+
+exports.Prisma.NgoScalarFieldEnum = {
+  id: 'id',
+  name: 'name',
+  slug: 'slug',
+  cnpj: 'cnpj',
+  description: 'description',
+  logo: 'logo',
+  coverImage: 'coverImage',
+  phone: 'phone',
+  email: 'email',
+  pixKey: 'pixKey',
+  city: 'city',
+  state: 'state',
+  isVerified: 'isVerified',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+};
+
+exports.Prisma.RescueCaseScalarFieldEnum = {
+  id: 'id',
+  title: 'title',
+  description: 'description',
+  species: 'species',
+  urgency: 'urgency',
+  status: 'status',
+  city: 'city',
+  state: 'state',
+  address: 'address',
+  photos: 'photos',
+  reportedById: 'reportedById',
+  assignedNgoId: 'assignedNgoId',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+};
+
+exports.Prisma.CampaignScalarFieldEnum = {
+  id: 'id',
+  title: 'title',
+  description: 'description',
+  goalAmount: 'goalAmount',
+  currentAmount: 'currentAmount',
+  status: 'status',
+  ngoId: 'ngoId',
+  rescueCaseId: 'rescueCaseId',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+};
+
+exports.Prisma.DonationScalarFieldEnum = {
+  id: 'id',
+  amount: 'amount',
+  paymentMethod: 'paymentMethod',
+  paymentStatus: 'paymentStatus',
+  campaignId: 'campaignId',
+  userId: 'userId',
+  createdAt: 'createdAt'
 };
 
 exports.Prisma.SortOrder = {
@@ -180,14 +245,44 @@ exports.Prisma.NullsOrder = {
   first: 'first',
   last: 'last'
 };
+exports.Role = exports.$Enums.Role = {
+  CITIZEN: 'CITIZEN',
+  VOLUNTEER: 'VOLUNTEER',
+  NGO_ADMIN: 'NGO_ADMIN',
+  ADMIN: 'ADMIN'
+};
 
+exports.UrgencyLevel = exports.$Enums.UrgencyLevel = {
+  LOW: 'LOW',
+  MEDIUM: 'MEDIUM',
+  HIGH: 'HIGH',
+  CRITICAL: 'CRITICAL'
+};
+
+exports.RescueStatus = exports.$Enums.RescueStatus = {
+  REPORTED: 'REPORTED',
+  IN_PROGRESS: 'IN_PROGRESS',
+  RESCUED: 'RESCUED',
+  READY_ADOPTION: 'READY_ADOPTION',
+  RESOLVED: 'RESOLVED'
+};
+
+exports.CampaignStatus = exports.$Enums.CampaignStatus = {
+  ACTIVE: 'ACTIVE',
+  COMPLETED: 'COMPLETED',
+  CANCELLED: 'CANCELLED'
+};
 
 exports.Prisma.ModelName = {
-  Post: 'Post',
   Account: 'Account',
   Session: 'Session',
   User: 'User',
-  VerificationToken: 'VerificationToken'
+  VerificationToken: 'VerificationToken',
+  Post: 'Post',
+  Ngo: 'Ngo',
+  RescueCase: 'RescueCase',
+  Campaign: 'Campaign',
+  Donation: 'Donation'
 };
 
 /**

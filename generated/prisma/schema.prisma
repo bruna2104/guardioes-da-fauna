@@ -8,38 +8,53 @@ generator client {
 
 datasource db {
   provider = "postgresql"
-  // NOTE: When using mysql or sqlserver, uncomment the @db.Text annotations in model Account below
-  // Further reading:
-  // https://next-auth.js.org/adapters/prisma#create-the-prisma-schema
-  // https://www.prisma.io/docs/reference/api-reference/prisma-schema-reference#string
   url      = env("DATABASE_URL")
 }
 
-model Post {
-  id        Int      @id @default(autoincrement())
-  name      String
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+// --- ENUMS ---
 
-  createdBy   User   @relation(fields: [createdById], references: [id])
-  createdById String
-
-  @@index([name])
+enum Role {
+  CITIZEN
+  VOLUNTEER
+  NGO_ADMIN
+  ADMIN
 }
 
-// Necessary for Next auth
+enum RescueStatus {
+  REPORTED // Registrado aguardando resgate
+  IN_PROGRESS // Voluntário/ONG a caminho ou em atendimento
+  RESCUED // Animal seguro e recebendo cuidados
+  READY_ADOPTION // Recuperado e disponível para adoção
+  RESOLVED // Caso finalizado/adotado
+}
+
+enum UrgencyLevel {
+  LOW
+  MEDIUM
+  HIGH
+  CRITICAL
+}
+
+enum CampaignStatus {
+  ACTIVE
+  COMPLETED
+  CANCELLED
+}
+
+// --- AUTH & USUÁRIOS ---
+
 model Account {
   id                       String  @id @default(cuid())
   userId                   String
   type                     String
   provider                 String
   providerAccountId        String
-  refresh_token            String? // @db.Text
-  access_token             String? // @db.Text
+  refresh_token            String?
+  access_token             String?
   expires_at               Int?
   token_type               String?
   scope                    String?
-  id_token                 String? // @db.Text
+  id_token                 String?
   session_state            String?
   user                     User    @relation(fields: [userId], references: [id], onDelete: Cascade)
   refresh_token_expires_in Int?
@@ -61,9 +76,22 @@ model User {
   email         String?   @unique
   emailVerified DateTime?
   image         String?
-  accounts      Account[]
-  sessions      Session[]
-  posts         Post[]
+  phone         String?
+  city          String?
+  state         String?
+  role          Role      @default(CITIZEN)
+
+  ngoId String?
+  ngo   Ngo?    @relation(fields: [ngoId], references: [id])
+
+  accounts  Account[]
+  sessions  Session[]
+  posts     Post[]
+  rescues   RescueCase[]
+  donations Donation[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @default(now()) @updatedAt
 }
 
 model VerificationToken {
@@ -72,4 +100,108 @@ model VerificationToken {
   expires    DateTime
 
   @@unique([identifier, token])
+}
+
+model Post {
+  id        Int      @id @default(autoincrement())
+  name      String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  createdBy   User   @relation(fields: [createdById], references: [id])
+  createdById String
+
+  @@index([name])
+}
+
+// --- ONGS PARCEIRAS ---
+
+model Ngo {
+  id          String  @id @default(cuid())
+  name        String
+  slug        String  @unique
+  cnpj        String? @unique
+  description String
+  logo        String?
+  coverImage  String?
+  phone       String
+  email       String
+  pixKey      String?
+  city        String
+  state       String
+  isVerified  Boolean @default(false)
+
+  members   User[]
+  rescues   RescueCase[]
+  campaigns Campaign[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+// --- RESGATES E ANIMAIS ---
+
+model RescueCase {
+  id          String       @id @default(cuid())
+  title       String
+  description String
+  species     String // Cão, Gato, Silvestre, etc.
+  urgency     UrgencyLevel @default(MEDIUM)
+  status      RescueStatus @default(REPORTED)
+
+  city    String
+  state   String
+  address String?
+  photos  String[] // Array de URLs de imagens
+
+  reportedById String
+  reportedBy   User   @relation(fields: [reportedById], references: [id])
+
+  assignedNgoId String?
+  assignedNgo   Ngo?    @relation(fields: [assignedNgoId], references: [id])
+
+  campaign Campaign?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([city, state])
+  @@index([status])
+}
+
+// --- DOAÇÕES E CAMPANHAS ---
+
+model Campaign {
+  id            String         @id @default(cuid())
+  title         String
+  description   String
+  goalAmount    Float
+  currentAmount Float          @default(0)
+  status        CampaignStatus @default(ACTIVE)
+
+  ngoId String
+  ngo   Ngo    @relation(fields: [ngoId], references: [id])
+
+  rescueCaseId String?     @unique
+  rescueCase   RescueCase? @relation(fields: [rescueCaseId], references: [id])
+
+  donations Donation[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Donation {
+  id            String @id @default(cuid())
+  amount        Float
+  paymentMethod String // PIX, CREDIT_CARD
+  paymentStatus String // PENDING, COMPLETED, FAILED
+
+  campaignId String
+  campaign   Campaign @relation(fields: [campaignId], references: [id])
+
+  userId String?
+  user   User?   @relation(fields: [userId], references: [id])
+
+  createdAt DateTime @default(now())
 }
